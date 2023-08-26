@@ -2,16 +2,16 @@ import { GetServerSideProps } from "next";
 
 import { PokemonCard } from "@/components";
 import { PokemonService } from "@/services";
-import { PokemonListItem } from "@/types";
+import { Pokemon } from "@/types";
 import { generatePokemonList } from "@/utils";
 
 type HomePageProps = {
-  pokemonList: Array<
-    PokemonListItem & {
-      id: number;
-      image: string;
-    }
-  >;
+  pokemonList: Array<{
+    id: number;
+    name: string;
+    types: Pokemon["types"];
+    image: string;
+  }>;
 };
 
 const HomePage = ({ pokemonList }: HomePageProps) => {
@@ -23,6 +23,7 @@ const HomePage = ({ pokemonList }: HomePageProps) => {
           id={pokemon.id}
           name={pokemon.name}
           image={pokemon.image}
+          types={pokemon.types}
         />
       ))}
     </section>
@@ -33,7 +34,7 @@ export const getServerSideProps: GetServerSideProps<
   HomePageProps
 > = async () => {
   const pokemonListRes = await PokemonService.getPokemonList();
-  const pokemonListData = generatePokemonList(pokemonListRes.results);
+  const pokemonListData = await generatePokemonList(pokemonListRes.results);
 
   return {
     props: {

@@ -1,5 +1,10 @@
 import { httpClient } from "@/http";
-import { BaseListResponse, CommonQueryParams, PokemonListItem } from "@/types";
+import {
+  BaseListResponse,
+  CommonQueryParams,
+  Pokemon,
+  PokemonListItem
+} from "@/types";
 
 export const PokemonService = {
   getPokemonList: async ({
@@ -14,5 +19,9 @@ export const PokemonService = {
         }
       })
       .json<BaseListResponse<PokemonListItem>>();
+  },
+
+  getOnePokemon: async ({ id }: { id: string }) => {
+    return await httpClient.get(`pokemon/${id}`).json<Pokemon>();
   }
 };

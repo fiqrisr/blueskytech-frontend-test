@@ -1,3 +1,5 @@
+import type { IPokemon } from "pokeapi-typescript";
+
 export type BaseListResponse<TResource> = {
   count: number;
   next: string | null;
@@ -14,3 +16,5 @@ export type PokemonListItem = {
   name: string;
   url: string;
 };
+
+export type Pokemon = IPokemon;
