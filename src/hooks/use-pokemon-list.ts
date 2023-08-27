@@ -1,15 +1,19 @@
 import { MouseEventHandler, useEffect, useState } from "react";
 
-import { PokemonCard } from "@/types";
+import { PokemonCard, PokemonListItem } from "@/types";
+import { getPokemonListItemDetailData } from "@/utils";
 
 type UsePokemonListProps = {
-  initialData: PokemonCard[];
+  initialData: Array<PokemonListItem | PokemonCard>;
 };
 
 export const usePokemonList = ({ initialData }: UsePokemonListProps) => {
-  const [pokemonListData, setPokemonListData] = useState<PokemonCard[]>([]);
+  const [pokemonListData, setPokemonListData] = useState<
+    Array<PokemonListItem | PokemonCard>
+  >([]);
   const [currentOffset, setCurrentOffset] = useState(0);
   const [hasNextPage, setHasNextPage] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     setPokemonListData(initialData.slice(0, 20));
@@ -17,17 +21,26 @@ export const usePokemonList = ({ initialData }: UsePokemonListProps) => {
     setHasNextPage(true);
   }, [initialData]);
 
-  const loadNextPage: MouseEventHandler = (e) => {
+  const loadNextPage: MouseEventHandler = async (e) => {
     e.preventDefault();
+    setLoading(true);
+
+    const nextPagePokemonListItemDetailData =
+      await getPokemonListItemDetailData(
+        (initialData as unknown as PokemonListItem[]).slice(
+          currentOffset,
+          currentOffset + 20
+        )
+      );
 
     const newPokemonListData = [
       ...pokemonListData,
-      ...initialData.slice(currentOffset, currentOffset + 20)
+      ...nextPagePokemonListItemDetailData
     ];
 
     setPokemonListData(newPokemonListData);
-
     setCurrentOffset(currentOffset + 20);
+    setLoading(false);
 
     if (newPokemonListData.length < initialData.length)
       return setHasNextPage(true);
@@ -38,6 +51,7 @@ export const usePokemonList = ({ initialData }: UsePokemonListProps) => {
   return {
     pokemonListData,
     hasNextPage,
-    loadNextPage
+    loadNextPage,
+    loading
   };
 };

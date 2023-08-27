@@ -1,25 +1,27 @@
 import { GetServerSideProps } from "next";
 
-import { Button, PokemonCard } from "@/components";
+import { Button, Spinner, PokemonCard } from "@/components";
 import { PokemonService } from "@/services";
-import { Pokemon, PokemonCard as PokemonCardProps } from "@/types";
+import { PokemonCard as PokemonCardProps, PokemonListItem } from "@/types";
 import { generatePokemonList } from "@/utils";
-import { useState } from "react";
-import { usePokemonList } from "@/hooks/use-pokemon-list";
+import { usePokemonList } from "@/hooks";
 
 type HomePageProps = {
-  pokemonList: PokemonCardProps[];
+  pokemonList: Array<PokemonListItem | PokemonCardProps>;
 };
 
 const HomePage = ({ pokemonList }: HomePageProps) => {
-  const { pokemonListData, hasNextPage, loadNextPage } = usePokemonList({
-    initialData: pokemonList
-  });
+  const { pokemonListData, hasNextPage, loadNextPage, loading } =
+    usePokemonList({
+      initialData: pokemonList
+    });
 
   return (
     <>
+      <div></div>
+
       <section className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-        {pokemonListData.map((pokemon) => (
+        {(pokemonListData as unknown as PokemonCardProps[]).map((pokemon) => (
           <PokemonCard
             key={pokemon.id}
             id={pokemon.id}
@@ -31,7 +33,9 @@ const HomePage = ({ pokemonList }: HomePageProps) => {
       </section>
 
       <div className="flex justify-center items-center mt-8">
-        {hasNextPage && (
+        {loading && <Spinner />}
+
+        {hasNextPage && !loading && (
           <Button onClick={loadNextPage} variant="outline">
             See more
           </Button>
