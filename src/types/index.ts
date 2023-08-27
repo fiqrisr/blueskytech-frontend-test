@@ -18,3 +18,10 @@ export type PokemonListItem = {
 };
 
 export type Pokemon = IPokemon;
+
+export type PokemonCard = {
+  id: number;
+  name: string;
+  types: Pokemon["types"];
+  image: string;
+};
