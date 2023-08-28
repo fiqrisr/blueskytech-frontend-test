@@ -1,4 +1,5 @@
 import { GetServerSideProps } from "next";
+import Head from "next/head";
 
 import {
   Button,
@@ -14,10 +15,8 @@ import {
 import { PokemonService } from "@/services";
 import { PokemonCard as PokemonCardProps, PokemonListItem } from "@/types";
 import { generatePokemonList } from "@/utils";
-import { usePokemonList } from "@/hooks";
-import { usePokemonFilters } from "@/hooks/use-pokemon-filters";
+import { usePokemonList, usePokemonFilters } from "@/hooks";
 import { MoveRight } from "lucide-react";
-import Head from "next/head";
 
 type HomePageProps = {
   pokemonList: Array<PokemonListItem | PokemonCardProps>;
@@ -31,11 +30,15 @@ const HomePage = ({ pokemonList, pokemonTypes = [] }: HomePageProps) => {
     selectedType,
     setSelectedType,
     selectedSort,
-    setSelectedSort
+    setSelectedSort,
+    debouncedSearch
   } = usePokemonFilters();
-  const { pokemonListData, hasNextPage, loadNextPage, loading } =
+  const { pokemonListData, hasNextPage, loadNextPage, loading, filterLoading } =
     usePokemonList({
-      initialData: pokemonList
+      initialData: pokemonList,
+      filters: {
+        search: debouncedSearch
+      }
     });
 
   return (
@@ -87,22 +90,28 @@ const HomePage = ({ pokemonList, pokemonTypes = [] }: HomePageProps) => {
         </Select>
       </div>
 
-      <section className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mt-8">
-        {(pokemonListData as unknown as PokemonCardProps[]).map((pokemon) => (
-          <PokemonCard
-            key={pokemon.id}
-            id={pokemon.id}
-            name={pokemon.name}
-            image={pokemon.image}
-            types={pokemon.types}
-          />
-        ))}
-      </section>
+      {filterLoading ? (
+        <div className="flex justify-center items-center mt-8">
+          {filterLoading && <Spinner />}
+        </div>
+      ) : (
+        <section className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mt-8">
+          {(pokemonListData as unknown as PokemonCardProps[]).map((pokemon) => (
+            <PokemonCard
+              key={pokemon.id}
+              id={pokemon.id}
+              name={pokemon.name}
+              image={pokemon.image}
+              types={pokemon.types}
+            />
+          ))}
+        </section>
+      )}
 
       <div className="flex justify-center items-center mt-8">
         {loading && <Spinner />}
 
-        {hasNextPage && !loading && (
+        {hasNextPage && !loading && !filterLoading && (
           <Button onClick={loadNextPage} variant="outline">
             See more
           </Button>

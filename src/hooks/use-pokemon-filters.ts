@@ -1,7 +1,9 @@
 import { useState } from "react";
+import { useDebounce } from ".";
 
 export const usePokemonFilters = () => {
   const [search, setSearch] = useState("");
+  const debouncedSearch = useDebounce(search, 300);
   const [selectedType, setSelectedType] = useState<string | undefined>(
     undefined
   );
@@ -13,6 +15,7 @@ export const usePokemonFilters = () => {
     selectedType,
     setSelectedType,
     selectedSort,
-    setSelectedSort
+    setSelectedSort,
+    debouncedSearch
   };
 };

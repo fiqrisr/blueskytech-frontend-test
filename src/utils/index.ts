@@ -16,6 +16,7 @@ export const getPokemonListItemDetailData = async (
 
       return {
         id: pokemonDetails.id,
+        url: pokemon.url,
         name: pokemonDetails.name,
         image: pokemonImage,
         types: pokemonDetails.types
