@@ -13,7 +13,7 @@ type PokemonCardProps = {
 const PokemonCard = ({ id, name, image, types }: PokemonCardProps) => {
   return (
     <Link
-      href={`/pokemon/${id}`}
+      href={`/pokemon/${name}`}
       className={clsx(
         "flex flex-col items-center justify-center border rounded-lg overflow-hidden transition-all pt-6 relative",
         "hover:shadow-xl hover:-translate-y-2 hover:bg-gray-100"

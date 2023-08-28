@@ -25,3 +25,10 @@ export type PokemonCard = {
   types: Pokemon["types"];
   image: string;
 };
+
+export type PokemonDetail = Pick<
+  IPokemon,
+  "id" | "name" | "height" | "types" | "weight"
+> & {
+  description: string;
+};

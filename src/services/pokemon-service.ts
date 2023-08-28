@@ -1,3 +1,5 @@
+import { IPokemonSpecies } from "pokeapi-typescript";
+
 import { httpClient } from "@/http";
 import {
   BaseListResponse,
@@ -23,5 +25,25 @@ export const PokemonService = {
 
   getOnePokemon: async ({ id }: { id: string }) => {
     return await httpClient.get(`pokemon/${id}`).json<Pokemon>();
+  },
+
+  getOnePokemonSpecies: async ({ id }: { id: string }) => {
+    return await httpClient
+      .get(`pokemon-species/${id}`)
+      .json<IPokemonSpecies>();
+  },
+
+  getAllPokemonTypes: async ({
+    limit = 18,
+    offset = 0
+  }: CommonQueryParams = {}) => {
+    return await httpClient
+      .get("type", {
+        searchParams: {
+          limit,
+          offset
+        }
+      })
+      .json<BaseListResponse<PokemonListItem>>();
   }
 };
