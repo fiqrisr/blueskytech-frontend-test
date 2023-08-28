@@ -1,27 +1,49 @@
 import Head from "next/head";
 import { GetServerSideProps } from "next";
 import { MoveLeft } from "lucide-react";
+import clsx from "clsx";
 
 import {
   Button,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  ScrollArea,
   PokemonHeader,
   PokemonAbout,
-  PokemonStats
+  PokemonStats,
+  Spinner
 } from "@/components";
 import { PokemonService } from "@/services";
-import { PokemonDetail } from "@/types";
+import { PokemonDetail, PokemonListItem } from "@/types";
 import Link from "next/link";
 import { getWeaknessesAndResistances } from "@/utils";
+import { usePokemonCompare } from "@/hooks";
 
 type PokemonDetailPageProps = {
+  pokemonList: PokemonListItem[];
   pokemonData: PokemonDetail;
 };
 
-const PokemonDetailPage = ({ pokemonData }: PokemonDetailPageProps) => {
+const PokemonDetailPage = ({
+  pokemonList,
+  pokemonData
+}: PokemonDetailPageProps) => {
+  const {
+    compareActive,
+    setCompareActive,
+    compareDataLoading,
+    selectedPokemon,
+    setSelectedPokemon,
+    selectedPokemonData
+  } = usePokemonCompare();
+
   return (
     <>
       <Head>
-        <title>{`${pokemonData.name} | Pokemon`}</title>
+        <title>{`${pokemonData.name} | Pokedex`}</title>
       </Head>
 
       <div className="flex justify-between">
@@ -32,15 +54,68 @@ const PokemonDetailPage = ({ pokemonData }: PokemonDetailPageProps) => {
           </Button>
         </Link>
 
-        <Button variant="outline">Compare</Button>
+        {!compareActive && (
+          <Button variant="outline" onClick={() => setCompareActive(true)}>
+            Compare
+          </Button>
+        )}
       </div>
 
       <PokemonHeader pokemonData={pokemonData} />
 
-      <section className="flex flex-col md:flex-row gap-4 mt-10">
-        <PokemonAbout {...pokemonData} />
-        <PokemonStats baseStats={pokemonData.stats} />
-      </section>
+      <div className={clsx(compareActive && "grid grid-cols-2")}>
+        <section
+          className={clsx(
+            "flex flex-col md:flex-row gap-4 mt-10",
+            compareActive && "pr-10 border-r-2 !flex-col"
+          )}
+        >
+          <PokemonAbout {...pokemonData} />
+          <PokemonStats baseStats={pokemonData.stats} />
+        </section>
+        {compareActive && (
+          <section
+            className={clsx(
+              "flex flex-col md:flex-row gap-4 mt-10",
+              compareActive && "pl-10 !flex-col"
+            )}
+          >
+            {!selectedPokemonData && (
+              <div className="flex items-center gap-3">
+                <span>Select Pokemon to compare:</span>
+                <Select
+                  value={selectedPokemon}
+                  onValueChange={setSelectedPokemon}
+                >
+                  <SelectTrigger className="max-w-[180px]">
+                    <SelectValue placeholder="Pokemon type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <ScrollArea className="h-[300px]">
+                      {pokemonList.map((pokemon) => (
+                        <SelectItem key={pokemon.name} value={pokemon.name}>
+                          {pokemon.name}
+                        </SelectItem>
+                      ))}
+                    </ScrollArea>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+            {compareDataLoading && (
+              <div className="flex justify-center items-center mt-8">
+                <Spinner />
+              </div>
+            )}
+            {selectedPokemonData && (
+              <>
+                <PokemonAbout {...selectedPokemonData} />
+                <PokemonStats baseStats={selectedPokemonData?.stats} />
+              </>
+            )}
+          </section>
+        )}
+      </div>
     </>
   );
 };
@@ -48,6 +123,8 @@ const PokemonDetailPage = ({ pokemonData }: PokemonDetailPageProps) => {
 export const getServerSideProps: GetServerSideProps<
   PokemonDetailPageProps
 > = async (ctx) => {
+  const pokemonListRes = await PokemonService.getPokemonList({ limit: 200 });
+
   const { id, abilities, name, height, stats, types, weight } =
     await PokemonService.getOnePokemon({
       id: ctx.params?.name as string
@@ -72,6 +149,7 @@ export const getServerSideProps: GetServerSideProps<
 
   return {
     props: {
+      pokemonList: pokemonListRes.results,
       pokemonData: {
         id,
         ability: abilities[0].ability.name,

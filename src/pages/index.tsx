@@ -41,7 +41,7 @@ const HomePage = ({ pokemonList, pokemonTypes = [] }: HomePageProps) => {
   return (
     <>
       <Head>
-        <title>Pokemon</title>
+        <title>Home | Pokedex</title>
       </Head>
 
       <div className="flex gap-5">

@@ -6,6 +6,7 @@ export { default as Spinner } from "./spinner";
 
 export * from "./button";
 export * from "./select";
+export * from "./scroll-area";
 
 export { default as PokemonCard } from "./pokemon-card";
 export { default as PokemonHeader } from "./pokemon-header";
