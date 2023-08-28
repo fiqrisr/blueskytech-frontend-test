@@ -6,6 +6,7 @@ import { Button, PokemonHeader, PokemonAbout } from "@/components";
 import { PokemonService } from "@/services";
 import { PokemonDetail } from "@/types";
 import Link from "next/link";
+import { getWeaknessesAndResistances } from "@/utils";
 
 type PokemonDetailPageProps = {
   pokemonData: PokemonDetail;
@@ -41,7 +42,7 @@ const PokemonDetailPage = ({ pokemonData }: PokemonDetailPageProps) => {
 export const getServerSideProps: GetServerSideProps<
   PokemonDetailPageProps
 > = async (ctx) => {
-  const { id, name, height, types, weight } =
+  const { id, abilities, name, height, types, weight } =
     await PokemonService.getOnePokemon({
       id: ctx.params?.name as string
     });
@@ -50,17 +51,33 @@ export const getServerSideProps: GetServerSideProps<
     id: ctx.params?.name as string
   });
 
+  const pokemonTypesData = await Promise.all(
+    types.map(async (type) => {
+      const { damage_relations } = await PokemonService.getOnePokemonType({
+        id: type.type.name
+      });
+
+      return damage_relations;
+    })
+  );
+
+  const { weaknesses, resistances } =
+    getWeaknessesAndResistances(pokemonTypesData);
+
   return {
     props: {
       pokemonData: {
         id,
+        ability: abilities[0].ability.name,
         description: flavor_text_entries.find(
           (text) => text.language.name === "en"
         )?.flavor_text!,
         name,
         height,
+        resistances,
         types,
-        weight
+        weight,
+        weaknesses
       }
     }
   };

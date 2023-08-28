@@ -1,13 +1,21 @@
-import { MouseEventHandler, useEffect, useState } from "react";
+import { MouseEventHandler, useCallback, useEffect, useState } from "react";
 
 import { PokemonCard, PokemonListItem } from "@/types";
 import { getPokemonListItemDetailData } from "@/utils";
 
 type UsePokemonListProps = {
   initialData: Array<PokemonListItem | PokemonCard>;
+  filters?: Partial<{
+    search: string;
+    type: string;
+    sort: string;
+  }>;
 };
 
-export const usePokemonList = ({ initialData }: UsePokemonListProps) => {
+export const usePokemonList = ({
+  initialData,
+  filters
+}: UsePokemonListProps) => {
   const [pokemonListData, setPokemonListData] = useState<
     Array<PokemonListItem | PokemonCard>
   >([]);
@@ -20,6 +28,18 @@ export const usePokemonList = ({ initialData }: UsePokemonListProps) => {
     setCurrentOffset(20);
     setHasNextPage(true);
   }, [initialData]);
+
+  const generateNewPokemonListData = useCallback(async () => {
+    const nextPagePokemonListItemDetailData =
+      await getPokemonListItemDetailData(
+        (initialData as unknown as PokemonListItem[]).slice(
+          currentOffset,
+          currentOffset + 20
+        )
+      );
+
+    return [...pokemonListData, ...nextPagePokemonListItemDetailData];
+  }, [currentOffset, initialData, pokemonListData]);
 
   const loadNextPage: MouseEventHandler = async (e) => {
     e.preventDefault();

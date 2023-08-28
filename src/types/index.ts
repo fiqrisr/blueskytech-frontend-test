@@ -30,5 +30,8 @@ export type PokemonDetail = Pick<
   IPokemon,
   "id" | "name" | "height" | "types" | "weight"
 > & {
+  ability: string;
   description: string;
+  weaknesses: string[];
+  resistances: string[];
 };

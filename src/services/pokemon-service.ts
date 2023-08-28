@@ -1,4 +1,4 @@
-import { IPokemonSpecies } from "pokeapi-typescript";
+import { IPokemonSpecies, IType } from "pokeapi-typescript";
 
 import { httpClient } from "@/http";
 import {
@@ -45,5 +45,9 @@ export const PokemonService = {
         }
       })
       .json<BaseListResponse<PokemonListItem>>();
+  },
+
+  getOnePokemonType: async ({ id }: { id: string }) => {
+    return await httpClient.get(`type/${id}`).json<IType>();
   }
 };
