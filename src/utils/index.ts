@@ -71,3 +71,7 @@ export const getWeaknessesAndResistances = (
 
   return { weaknesses, resistances };
 };
+
+export const capitalize = (name: string) => {
+  return name.replace(/\b\w/g, (l) => l.toUpperCase());
+};

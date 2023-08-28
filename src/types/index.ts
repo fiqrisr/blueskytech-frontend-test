@@ -28,7 +28,7 @@ export type PokemonCard = {
 
 export type PokemonDetail = Pick<
   IPokemon,
-  "id" | "name" | "height" | "types" | "weight"
+  "id" | "name" | "height" | "stats" | "types" | "weight"
 > & {
   ability: string;
   description: string;

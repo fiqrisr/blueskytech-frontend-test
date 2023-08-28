@@ -10,3 +10,4 @@ export * from "./select";
 export { default as PokemonCard } from "./pokemon-card";
 export { default as PokemonHeader } from "./pokemon-header";
 export { default as PokemonAbout } from "./pokemon-about";
+export { default as PokemonStats } from "./pokemon-stats";

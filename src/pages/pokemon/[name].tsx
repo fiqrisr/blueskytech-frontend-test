@@ -2,7 +2,12 @@ import Head from "next/head";
 import { GetServerSideProps } from "next";
 import { MoveLeft } from "lucide-react";
 
-import { Button, PokemonHeader, PokemonAbout } from "@/components";
+import {
+  Button,
+  PokemonHeader,
+  PokemonAbout,
+  PokemonStats
+} from "@/components";
 import { PokemonService } from "@/services";
 import { PokemonDetail } from "@/types";
 import Link from "next/link";
@@ -32,8 +37,9 @@ const PokemonDetailPage = ({ pokemonData }: PokemonDetailPageProps) => {
 
       <PokemonHeader pokemonData={pokemonData} />
 
-      <section className="flex gap-4 mt-10">
+      <section className="flex flex-col md:flex-row gap-4 mt-10">
         <PokemonAbout {...pokemonData} />
+        <PokemonStats baseStats={pokemonData.stats} />
       </section>
     </>
   );
@@ -42,7 +48,7 @@ const PokemonDetailPage = ({ pokemonData }: PokemonDetailPageProps) => {
 export const getServerSideProps: GetServerSideProps<
   PokemonDetailPageProps
 > = async (ctx) => {
-  const { id, abilities, name, height, types, weight } =
+  const { id, abilities, name, height, stats, types, weight } =
     await PokemonService.getOnePokemon({
       id: ctx.params?.name as string
     });
@@ -75,6 +81,7 @@ export const getServerSideProps: GetServerSideProps<
         name,
         height,
         resistances,
+        stats,
         types,
         weight,
         weaknesses
